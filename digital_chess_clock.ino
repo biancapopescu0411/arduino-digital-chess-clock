@@ -48,7 +48,7 @@ void setup() {
   // Initializare LCD
   lcd.begin(16, 2);
 
-  // 🔹 Citire mod preferat salvat in EEPROM
+  // Citire mod preferat salvat in EEPROM
   currentMode = EEPROM.read(0);
   if (currentMode < 0 || currentMode >= numModes) {
     currentMode = 0;
@@ -121,6 +121,23 @@ void loop() {
   }
 
   if (gameRunning) {
+    // reset joc daca se apasa din nou butonul select
+    if (digitalRead(buttonSelect) == HIGH && millis() - lastButtonPress > debounceDelay) {
+      gameRunning = false;
+      modeSelected = false;
+      alarmTriggered = false;
+      timeP1 = 0;
+      timeP2 = 0;
+      lcd.clear();
+      lcd.setCursor(0, 0);
+      lcd.print("Select Mode:");
+      lcd.setCursor(0, 1);
+      lcd.print(gameModes[currentMode]);
+      updateDisplay(timeP1, digitPins1, segmentPins1);
+      updateDisplay(timeP2, digitPins2, segmentPins2);
+      lastButtonPress = millis();
+    }
+
     if (millis() - lastTick >= 1000) {
       if (player1Turn && timeP1 > 0) timeP1--;
       if (!player1Turn && timeP2 > 0) timeP2--;
